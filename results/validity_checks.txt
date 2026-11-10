@@ -1,0 +1,113 @@
+RQ1 - H0 A: home win rate = 50% in each normal regular season
+Test: scipy.stats.binomtest (two-sided), one test per season.
+
+Sample size per season and test results:
+ SEASON  games  home_wins  win_rate  expected_wins_H0   p_value  p_bonferroni
+   2004   1230        744    0.6049               615 1.916e-13     3.066e-12
+   2005   1230        742    0.6033               615 4.513e-13     7.222e-12
+   2006   1230        727    0.5911               615 1.822e-10     2.915e-09
+   2007   1230        739    0.6008               615 1.591e-12     2.546e-11
+   2008   1230        748    0.6081               615 3.319e-14      5.31e-13
+   2009   1230        731    0.5943               615 3.956e-11     6.329e-10
+   2010   1230        743    0.6041               615 2.946e-13     4.714e-12
+   2011    990        580    0.5859               495 7.289e-08     1.166e-06
+   2012   1229        752    0.6119             614.5 4.219e-15      6.75e-14
+   2013   1230        714    0.5805               615 1.814e-08     2.903e-07
+   2014   1230        707    0.5748               615  1.72e-07     2.752e-06
+   2015   1230        724    0.5886               615 5.533e-10     8.853e-09
+   2016   1230        718    0.5837               615 4.671e-09     7.473e-08
+   2017   1230        712    0.5789               615 3.506e-08      5.61e-07
+   2018   1230        729    0.5927               615 8.545e-11     1.367e-09
+   2021   1230        669    0.5439               615  0.002268       0.03629
+
+Assumption 1 - large enough sample: binomtest is exact, so it does not need a large sample. Smallest expected count under H0 is 495 (>= 10): OK.
+
+Assumption 2 - independent games. Lag-1 autocorrelation of HOME_TEAM_WINS in date order:
+ SEASON     lag1_r  bound_95  within_bound
+   2004 -0.0006314   0.05589          True
+   2005    0.00553   0.05589          True
+   2006   -0.04731   0.05589          True
+   2007    0.02456   0.05589          True
+   2008   -0.03084   0.05589          True
+   2009   -0.01618   0.05589          True
+   2010    0.03205   0.05589          True
+   2011    0.03103   0.06229          True
+   2012    0.01407   0.05591          True
+   2013    0.08613   0.05589         False
+   2014    0.03284   0.05589          True
+   2015   0.003639   0.05589          True
+   2016    0.01714   0.05589          True
+   2017   -0.01444   0.05589          True
+   2018     -0.021   0.05589          True
+   2021   -0.02172   0.05589          True
+15 of 16 seasons are inside the 95% bound (about 1 in 20 would fall outside by chance).
+Limitation: this only checks consecutive games across the league. Games of the same team (strength, schedule, injuries) are not fully independent, so p-values may be slightly too small.
+
+Multiple testing: 16 seasons are tested, so Bonferroni-adjusted p-values are also shown.
+
+========================================================================
+
+RQ1 - H0 B: no trend in home win rate across normal seasons (slope = 0)
+Test: statsmodels OLS, win_rate ~ SEASON, n = 16 seasons.
+Slope = -0.00241 per season (-2.41 percentage points per decade), p = 0.001562, R^2 = 0.522
+
+Assumption 1 - residuals roughly normal (Q-Q plot: figures/fig4_rq1_trend_diagnostics.png). Shapiro-Wilk p = 0.9915: OK.
+Assumption 2 - no autocorrelation in residuals. Durbin-Watson = 2.404 (about 2 = none; below 1.5 or above 2.5 is a warning): OK.
+Note: seasons 2019 and 2020 are missing, so 2018 and 2021 are treated as neighbors.
+Assumption 3 - linear relationship (residual plot in the same figure). p-value of an added SEASON^2 term = 0.08074: OK.
+Influence check: largest Cook's distance = 1.213 (SEASON 2021); rule-of-thumb cutoff 4/n = 0.250: NOT MET.
+Without SEASON 2021: slope = -0.00156, p = 0.01676.
+
+========================================================================
+
+RQ2 - H0 C: home win rate in bubble / covid_2021 = normal
+Test: statsmodels proportions_ztest (two-sided), regular season (GAME_TYPE 2) and playoffs (GAME_TYPE 4) separately.
+ GAME_TYPE     period  n_period  rate_period  n_normal  rate_normal  min_np       z  p_value  np_check
+         2 covid_2021      1080       0.5435     19439       0.5905     493  -3.054 0.002257      True
+         2     bubble        88       0.5568     19439       0.5905      39 -0.6413   0.5213      True
+         4 covid_2021        85       0.5647      1341       0.6391      37  -1.381   0.1673      True
+         4     bubble        83       0.4819      1341       0.6391      40  -2.877 0.004008      True
+
+Assumption - n*p and n*(1-p) >= 10 in both groups (min_np is the smallest of the four counts): OK.
+Assumption - independent games: same caveat as RQ1 A.
+
+========================================================================
+
+RQ2 - H0 D: mean POINT_DIFF in bubble / covid_2021 = normal
+Test: Welch's t-test (scipy ttest_ind, equal_var=False), regular season and playoffs separately.
+
+Assumption 1 - POINT_DIFF roughly normal, or n large enough for the CLT (Q-Q plots: figures/fig5_rq2_point_diff_qq.png).
+ GAME_TYPE     period     n   mean    sd  skewness  excess_kurtosis  shapiro_p
+         2     normal 19439  2.842 13.38 -0.005409           0.2101        NaN
+         2 covid_2021  1080 0.9435 15.18   -0.1519           0.3604   0.008396
+         2     bubble    88  1.648 12.68  -0.02568           0.2516     0.7931
+         4     normal  1341  4.506 13.79   -0.1978           0.3831  0.0001647
+         4 covid_2021    85  3.341  14.7   0.03729          -0.3602     0.5083
+         4     bubble    83      1 14.25    0.5298           0.1054    0.07309
+Largest |skewness| = 0.530, largest |excess kurtosis| = 0.383 (|skew| < 1 and |kurtosis| < 1 is close to normal). Smallest group n = 83. Shapiro-Wilk is skipped for groups over 5000 games because it rejects tiny departures.
+Verdict: OK (near-normal shape, and every group has n >= 30 for the CLT).
+
+Assumption 2 - equal variances: NOT required by Welch's test. Levene's test is shown to justify using Welch instead of the pooled t-test:
+ GAME_TYPE     period  mean_diff  sd_ratio  levene_p  welch_t  welch_p
+         2 covid_2021     -1.898     1.135 5.265e-08   -4.022 6.13e-05
+         2     bubble     -1.194    0.9476    0.5315  -0.8811   0.3807
+         4 covid_2021     -1.165     1.066    0.1913  -0.7114   0.4786
+         4     bubble     -3.506     1.033    0.4815   -2.179  0.03186
+Group sizes are very unequal (normal is over 100 times larger than bubble), so the pooled t-test would be unreliable if the variances differed even a little; Welch's test avoids this.
+Assumption 3 - independent games: same caveat as RQ1 A.
+
+========================================================================
+
+RQ2 - Permutation tests (for H0 C and H0 D)
+Method: pool the two groups, shuffle the PERIOD labels 10000 times, and count how often the shuffled difference in means is at least as extreme as the observed one (two-sided, seed 163).
+Why: it does not assume normality, a large sample, or equal variances. Its only assumption is exchangeability: under H0 the period label does not matter, which requires independent games. This makes it a good check for the small bubble groups (88 and 83 games), where the z-test and t-test rely on large-sample approximations.
+ GAME_TYPE     period        outcome  observed_diff   perm_p
+         2 covid_2021 HOME_TEAM_WINS         -0.047   0.0014
+         2 covid_2021     POINT_DIFF         -1.898   0.0002
+         2     bubble HOME_TEAM_WINS        -0.0337   0.5831
+         2     bubble     POINT_DIFF         -1.194   0.3878
+         4 covid_2021 HOME_TEAM_WINS       -0.07437   0.2036
+         4 covid_2021     POINT_DIFF         -1.165   0.4416
+         4     bubble HOME_TEAM_WINS        -0.1571 0.007399
+         4     bubble     POINT_DIFF         -3.506     0.03
+Smallest possible p-value with 10000 shuffles is about 9.999e-05.

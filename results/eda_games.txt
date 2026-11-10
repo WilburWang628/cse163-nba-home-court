@@ -1,0 +1,97 @@
+1. DATA SIZE
+Raw games.csv: 26651 rows x 21 columns
+Cleaned games: 24835 rows x 25 columns
+Each row is one NBA game, with the home team's and the away team's box-score totals side by side.
+Cleaning removed rows with missing scores, repeated GAME_IDs, preseason games and play-in games, and added GAME_TYPE, POINT_DIFF, BUBBLE and PERIOD.
+Cleaned data covers 2003-10-28 to 2022-12-22 (SEASON 2003 to 2022).
+
+2. MISSING VALUES (raw games.csv)
+Total rows: 26651. Columns with missing values:
+              missing  percent
+PTS_home           99     0.37
+FG_PCT_home        99     0.37
+FT_PCT_home        99     0.37
+FG3_PCT_home       99     0.37
+AST_home           99     0.37
+REB_home           99     0.37
+PTS_away           99     0.37
+FG_PCT_away        99     0.37
+FT_PCT_away        99     0.37
+FG3_PCT_away       99     0.37
+AST_away           99     0.37
+REB_away           99     0.37
+All other 9 columns have no missing values.
+The missing values all come from the same 99 rows: every box-score column (points, shooting percentages, assists, rebounds) is empty for both teams.
+These games were played from 2003-10-07 to 2003-10-24. GAME_ID first digit counts: {'1': 99} (1 = preseason).
+GAME_STATUS_TEXT for these rows: {'Final': 99}, so they are finished games whose box scores were not recorded, not unfinished games.
+Cleaning drops these rows (dropna on PTS_home). They are all preseason games, which the analysis excludes anyway, so no regular-season or playoff game is lost.
+Missing values in the cleaned data: 0.
+
+3. RESEARCH VARIABLES (cleaned data, all 24835 games)
+Numeric variables:
+                mean    std      min       Q1   median       Q3      max
+POINT_DIFF     2.872 13.469  -58.000   -7.000    4.000   12.000   73.000
+PTS_home     103.635 13.266   59.000   95.000  103.000  112.000  168.000
+PTS_away     100.762 13.421   54.000   91.000  100.000  110.000  168.000
+FG_PCT_home    0.462  0.056    0.250    0.423    0.461    0.500    0.684
+FG_PCT_away    0.451  0.055    0.244    0.413    0.450    0.488    0.687
+FT_PCT_home    0.762  0.100    0.143    0.700    0.767    0.833    1.000
+FT_PCT_away    0.760  0.103    0.143    0.696    0.767    0.833    1.000
+REB_home      43.344  6.603   17.000   39.000   43.000   48.000   72.000
+REB_away      42.056  6.510   20.000   38.000   42.000   46.000   81.000
+SEASON      2012.120  5.586 2003.000 2007.000 2012.000 2017.000 2022.000
+
+Categorical variables:
+GAME_TYPE:
+  2: 23244 (93.6%)
+  4: 1591 (6.4%)
+PERIOD:
+  bubble: 171 (0.7%)
+  covid_2021: 1165 (4.7%)
+  exclude: 2719 (10.9%)
+  normal: 20780 (83.7%)
+HOME_TEAM_WINS:
+  0: 10160 (40.9%)
+  1: 14675 (59.1%)
+GAME_TYPE: 2 = regular season, 4 = playoffs. HOME_TEAM_WINS: 1 = home team won, 0 = home team lost.
+
+4. HOME-COURT ADVANTAGE TABLES
+Figure 1: home win rate by season (normal regular-season games)
+ SEASON  games  home_wins  win_rate  ci_low  ci_high
+   2004   1230        744     0.605   0.578    0.632
+   2005   1230        742     0.603   0.576    0.631
+   2006   1230        727     0.591   0.564    0.619
+   2007   1230        739     0.601   0.573    0.628
+   2008   1230        748     0.608   0.581    0.635
+   2009   1230        731     0.594   0.567    0.622
+   2010   1230        743     0.604   0.577    0.631
+   2011    990        580     0.586   0.555    0.617
+   2012   1229        752     0.612   0.585    0.639
+   2013   1230        714     0.580   0.553    0.608
+   2014   1230        707     0.575   0.547    0.602
+   2015   1230        724     0.589   0.561    0.616
+   2016   1230        718     0.584   0.556    0.611
+   2017   1230        712     0.579   0.551    0.606
+   2018   1230        729     0.593   0.565    0.620
+   2021   1230        669     0.544   0.516    0.572
+
+Figure 2: home win rate by PERIOD and GAME_TYPE (95% CI, normal approximation)
+    PERIOD  GAME_TYPE  games  home_wins  win_rate  ci_low  ci_high
+    normal          2  19439      11479     0.591   0.584    0.597
+    normal          4   1341        857     0.639   0.613    0.665
+covid_2021          2   1080        587     0.544   0.514    0.573
+covid_2021          4     85         48     0.565   0.459    0.670
+    bubble          2     88         49     0.557   0.453    0.661
+    bubble          4     83         40     0.482   0.374    0.589
+
+Figure 3: POINT_DIFF (home - away) by PERIOD (regular season and playoffs)
+            count  mean    std  median
+PERIOD                                
+normal      20780 2.949 13.414   4.000
+covid_2021   1165 1.118 15.156   2.000
+bubble        171 1.333 13.429   2.000
+
+5. FIGURES
+figures/fig1_home_win_rate_by_season.png
+figures/fig2_home_win_rate_by_period.png
+figures/fig3_point_diff_by_period.png

@@ -51,14 +51,29 @@ Run `source .venv/bin/activate` again every time you open a new terminal.
 ## 3. Run the scripts
 
 Run every command from the project folder with the virtual environment
-activated.
+activated, **in this order**. Each analysis script cleans `data/games.csv`
+itself (by calling `clean.py`), so steps 3 and 4 do not depend on the
+`*_clean.csv` files, but steps 1 and 2 are the quickest way to confirm the
+setup works.
 
-| Command | What it does |
+| Step | Command | What it does | Output |
+|---|---|---|---|
+| 1 | `python check_setup.py` | Checks that the data loads and the libraries are installed. | Prints `Setup OK!` |
+| 2 | `python clean.py` | Cleans `games.csv`, `games_details.csv`, `ranking.csv` and `teams.csv`, adds `GAME_TYPE`, `POINT_DIFF`, `BUBBLE` and `PERIOD`, and prints row counts and games per `PERIOD` x `GAME_TYPE`. | `data/*_clean.csv` |
+| 3 | `python eda_games.py` | Exploratory data analysis of the games: data size, missing values, summaries of the research variables, and home win rates by season and by period. | `results/eda_games.txt`, `figures/fig1`–`fig3` |
+| 4 | `python validity_checks.py` | Result Validity checks for RQ1 and RQ2: runs each planned test (binomial test, OLS trend, two-proportion z-test, Welch's t-test, permutation test) and checks its assumptions. | `results/validity_checks.txt`, `figures/fig4`–`fig5` |
+
+### Tests and style
+
+Each test file uses small hand-made DataFrames whose correct results can be
+worked out by hand. Each prints a "passed" message at the end.
+
+| Command | Tests |
 |---|---|
-| `python check_setup.py` | Checks that the data loads and the libraries are installed. Prints `Setup OK!` at the end. |
-| `python clean.py` | Cleans `games.csv`, `games_details.csv`, `ranking.csv` and `teams.csv`, prints row counts, and writes `games_clean.csv`, `games_details_clean.csv`, `ranking_clean.csv` and `teams_clean.csv` into `data/`. |
-| `python test_clean.py` | Runs the tests for `clean.py` on small hand-made DataFrames. Prints `All tests passed!` at the end. |
-| `flake8 clean.py test_clean.py check_setup.py` | Checks code style. No output means no problems. |
+| `python test_clean.py` | `clean.py` |
+| `python test_eda.py` | calculation functions in `eda_games.py` |
+| `python test_validity_checks.py` | calculation functions in `validity_checks.py` |
+| `flake8 *.py` | code style of every script (no output means no problems) |
 
 ## Cleaned data
 
@@ -84,7 +99,13 @@ Other useful columns:
 
 ## Files
 
-- `check_setup.py` – environment and data sanity check
-- `clean.py` – data cleaning functions and the cleaning pipeline
-- `test_clean.py` – tests for `clean.py`
-- `requirements.txt` – Python packages used by the project
+| File | Purpose |
+|---|---|
+| `check_setup.py` | Environment and data sanity check |
+| `clean.py` | Data cleaning functions and the cleaning pipeline |
+| `eda_games.py` | Exploratory data analysis of `games.csv` |
+| `validity_checks.py` | Hypothesis tests and assumption checks for RQ1 and RQ2 |
+| `test_clean.py`, `test_eda.py`, `test_validity_checks.py` | Tests for the scripts above |
+| `figures/` | Figures produced by `eda_games.py` and `validity_checks.py` |
+| `results/` | Text results produced by `eda_games.py` and `validity_checks.py` |
+| `requirements.txt` | Python packages used by the project |
