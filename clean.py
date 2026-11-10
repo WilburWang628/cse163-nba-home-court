@@ -7,7 +7,8 @@ folder and writes a cleaned version of each:
 - games_clean.csv: one row per regular-season or playoff game, plus
   GAME_TYPE, POINT_DIFF, BUBBLE and PERIOD
 - games_details_clean.csv: one row per player who played in those games,
-  with minutes as a number and HOME / BUBBLE flags
+  with minutes as a number, a HOME flag, and the game's BUBBLE and
+  PERIOD labels
 - ranking_clean.csv: daily regular-season standings with numeric
   home / road wins and losses
 - teams_clean.csv: one row per team with name and arena information
@@ -40,7 +41,7 @@ COVID_SEASON = 2020
 TEAM_COLUMNS = ["TEAM_ID", "ABBREVIATION", "CITY", "NICKNAME",
                 "ARENA", "ARENACAPACITY"]
 GAME_COLUMNS_FOR_DETAILS = ["GAME_ID", "HOME_TEAM_ID", "VISITOR_TEAM_ID",
-                            "SEASON", "GAME_TYPE", "BUBBLE"]
+                            "SEASON", "GAME_TYPE", "BUBBLE", "PERIOD"]
 
 
 def load_games(path):
@@ -179,7 +180,7 @@ def clean_details(details, games):
     - drops repeated rows for the same GAME_ID and PLAYER_ID
     - converts MIN to minutes as a float (see parse_minutes)
     - keeps only games that appear in the cleaned games, adding their
-      SEASON, GAME_TYPE and BUBBLE columns
+      SEASON, GAME_TYPE, BUBBLE and PERIOD columns
     - drops rows whose team is neither the home nor the visiting team
     - adds HOME (True if the player's team was the home team)
     Neither input DataFrame is modified.

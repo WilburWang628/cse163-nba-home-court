@@ -60,6 +60,28 @@ activated.
 | `python test_clean.py` | Runs the tests for `clean.py` on small hand-made DataFrames. Prints `All tests passed!` at the end. |
 | `flake8 clean.py test_clean.py check_setup.py` | Checks code style. No output means no problems. |
 
+## Cleaned data
+
+`python clean.py` keeps only regular-season (`GAME_TYPE` 2) and playoff
+(`GAME_TYPE` 4) games. Every game in `games_clean.csv`, and every player row
+in `games_details_clean.csv`, gets a `PERIOD` label:
+
+| `PERIOD` | Games | Why |
+|---|---|---|
+| `bubble` | Played from 2020-07-30 to 2020-10-11 | Orlando bubble: no fans, neutral site |
+| `covid_2021` | `SEASON` 2020 (the 2020-21 season) | Very few or no fans in most arenas |
+| `normal` | `SEASON` 2004–2018 and 2021 | Regular crowds; the comparison group |
+| `exclude` | `SEASON` 2003, `SEASON` 2022, and non-bubble `SEASON` 2019 games | 2022 is incomplete in the data; 2003 is outside our study period; 2019 games before the shutdown are left out so that season only contributes bubble games |
+
+Other useful columns:
+
+- `games_clean.csv`: `POINT_DIFF` (home points minus away points),
+  `BUBBLE` (True for bubble games)
+- `games_details_clean.csv`: `MIN` (minutes played as a number), `HOME`
+  (True if the player's team was the home team)
+- `ranking_clean.csv`: `HOME_W`, `HOME_L`, `ROAD_W`, `ROAD_L`
+- `teams_clean.csv`: `TEAM_NAME` (e.g. "Los Angeles Lakers")
+
 ## Files
 
 - `check_setup.py` – environment and data sanity check

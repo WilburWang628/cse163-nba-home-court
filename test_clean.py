@@ -93,6 +93,7 @@ def make_clean_games_for_details():
         "SEASON": [2020, 2019],
         "GAME_TYPE": [2, 4],
         "BUBBLE": [False, True],
+        "PERIOD": ["covid_2021", "bubble"],
     })
 
 
@@ -279,7 +280,7 @@ def test_clean_details():
     """
     Checks that clean_details keeps exactly rows 0 and 3 of
     make_raw_details, converts MIN, and adds the right HOME, BUBBLE,
-    SEASON and GAME_TYPE values from the games table.
+    PERIOD, SEASON and GAME_TYPE values from the games table.
     """
     raw = make_raw_details()
     games = make_clean_games_for_details()
@@ -292,6 +293,7 @@ def test_clean_details():
     # Team 10 is at home in the first game and away in the second.
     assert list(result["HOME"]) == [True, False]
     assert list(result["BUBBLE"]) == [False, True]
+    assert list(result["PERIOD"]) == ["covid_2021", "bubble"]
     assert list(result["SEASON"]) == [2020, 2019]
     assert list(result["GAME_TYPE"]) == [2, 4]
     assert "HOME_TEAM_ID" not in result.columns
@@ -365,6 +367,8 @@ def test_main():
     # Team 1 is home in game 21900010 and away in game 21900011.
     assert list(saved_details["HOME"]) == [True, False]
     assert list(saved_details["MIN"]) == [10.0, 20.0]
+    # Game 21900010 is the day before the bubble, 21900011 is inside it.
+    assert list(saved_details["PERIOD"]) == ["exclude", "bubble"]
 
     assert list(saved_ranking["TEAM_ID"]) == [1, 2]
     assert len(saved_teams) == 4
