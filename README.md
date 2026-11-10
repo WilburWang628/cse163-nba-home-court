@@ -71,7 +71,7 @@ in `games_details_clean.csv`, gets a `PERIOD` label:
 | `bubble` | Played from 2020-07-30 to 2020-10-11 | Orlando bubble: no fans, neutral site |
 | `covid_2021` | `SEASON` 2020 (the 2020-21 season) | Very few or no fans in most arenas |
 | `normal` | `SEASON` 2004–2018 and 2021 | Regular crowds; the comparison group |
-| `exclude` | `SEASON` 2003, `SEASON` 2022, and non-bubble `SEASON` 2019 games | 2022 is incomplete in the data; 2003 is outside our study period; 2019 games before the shutdown are left out so that season only contributes bubble games |
+| `exclude` | `SEASON` 2003, `SEASON` 2022, and non-bubble `SEASON` 2019 games | 2022 is incomplete in the data (it ends in December 2022). 2003 and the non-bubble 2019 games are left out by design; they could also be counted as `normal` |
 
 Other useful columns:
 
