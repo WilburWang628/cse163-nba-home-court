@@ -13,8 +13,8 @@ import tempfile
 
 import pandas as pd
 
-from clean import (load_games, load_csv, clean_games, clean_teams,
-                   split_record, clean_ranking, parse_minutes,
+from clean import (load_games, load_csv, clean_games, add_period,
+                   clean_teams, split_record, clean_ranking, parse_minutes,
                    clean_details, main)
 
 
@@ -33,6 +33,7 @@ def make_raw_games():
                           "2020-10-11", "2020-10-12", "2021-01-05"],
         "GAME_ID": [22000001, 22000001, 21900002,
                     41900003, 12000004, 22000005],
+        "SEASON": [2019, 2019, 2019, 2019, 2020, 2020],
         "PTS_home": [110.0, 999.0, 100.0, 120.0, 90.0, math.nan],
         "PTS_away": [100.0, 0.0, 105.0, 101.0, 80.0, 100.0],
     })
@@ -179,9 +180,29 @@ def test_clean_games():
     assert list(result["POINT_DIFF"]) == [10.0, -5.0, 19.0]
     # Both bubble boundary dates count as bubble games.
     assert list(result["BUBBLE"]) == [False, True, True]
+    # Non-bubble SEASON 2019 games are excluded.
+    assert list(result["PERIOD"]) == ["exclude", "bubble", "bubble"]
 
     # The original DataFrame is not changed.
     assert len(raw) == 6
+
+
+def test_add_period():
+    """
+    Checks add_period on a 7-row DataFrame that covers all four PERIOD
+    labels, including both excluded edge seasons (2003 and 2022) and
+    the bubble / non-bubble split inside SEASON 2019.
+    """
+    df = pd.DataFrame({
+        "SEASON": [2003, 2004, 2019, 2019, 2020, 2021, 2022],
+        "BUBBLE": [False, False, True, False, False, False, False],
+    })
+    result = add_period(df)
+
+    assert list(result["PERIOD"]) == ["exclude", "normal", "bubble",
+                                      "exclude", "covid_2021", "normal",
+                                      "exclude"]
+    assert "PERIOD" not in df.columns
 
 
 def test_clean_teams():
@@ -336,6 +357,9 @@ def test_main():
     assert list(saved_games["GAME_ID"]) == [21900010, 21900011, 42000013]
     assert list(saved_games["POINT_DIFF"]) == [10.0, -2.0, 2.0]
     assert list(saved_games["BUBBLE"]) == [False, True, False]
+    assert list(saved_games["PERIOD"]) == ["exclude", "bubble",
+                                           "covid_2021"]
+    assert "Games by PERIOD and GAME_TYPE" in printed
 
     assert list(saved_details["GAME_ID"]) == [21900010, 21900011]
     # Team 1 is home in game 21900010 and away in game 21900011.
@@ -353,6 +377,7 @@ def run_all_tests():
     test_load_games()
     test_load_csv()
     test_clean_games()
+    test_add_period()
     test_clean_teams()
     test_split_record()
     test_clean_ranking()

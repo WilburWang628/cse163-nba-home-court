@@ -5,7 +5,7 @@ Data cleaning for the Kaggle dataset nathanlauga/nba-games. Reads
 games.csv, games_details.csv, ranking.csv and teams.csv from the data
 folder and writes a cleaned version of each:
 - games_clean.csv: one row per regular-season or playoff game, plus
-  GAME_TYPE, POINT_DIFF and BUBBLE
+  GAME_TYPE, POINT_DIFF, BUBBLE and PERIOD
 - games_details_clean.csv: one row per player who played in those games,
   with minutes as a number and HOME / BUBBLE flags
 - ranking_clean.csv: daily regular-season standings with numeric
@@ -31,6 +31,11 @@ BUBBLE_END = "2020-10-11"
 
 # games.csv starts with the 2003-04 season.
 FIRST_SEASON = 2003
+
+# Seasons used for the PERIOD label (see add_period). SEASON 2020 is the
+# 2020-21 season, played with few or no fans.
+NORMAL_SEASONS = list(range(2004, 2019)) + [2021]
+COVID_SEASON = 2020
 
 TEAM_COLUMNS = ["TEAM_ID", "ABBREVIATION", "CITY", "NICKNAME",
                 "ARENA", "ARENACAPACITY"]
@@ -65,6 +70,7 @@ def clean_games(df):
       (PTS_home - PTS_away) and BUBBLE (True if the game date is
       between BUBBLE_START and BUBBLE_END, inclusive)
     - keeps only regular-season and playoff games
+    - adds PERIOD (see add_period)
     The input DataFrame is not modified.
     """
     df = df.dropna(subset=["PTS_home"])
@@ -77,7 +83,27 @@ def clean_games(df):
     df["BUBBLE"] = df["GAME_DATE_EST"].between(BUBBLE_START, BUBBLE_END)
 
     df = df[df["GAME_TYPE"].isin(KEEP_TYPES)]
+    df = add_period(df)
     return df.reset_index(drop=True)
+
+
+def add_period(df):
+    """
+    Takes a games DataFrame with SEASON and BUBBLE columns and returns a
+    copy with a PERIOD column:
+    - "bubble": BUBBLE is True (2020 Orlando bubble)
+    - "covid_2021": SEASON is COVID_SEASON (the 2020-21 season)
+    - "normal": SEASON is in NORMAL_SEASONS (2004-2018 and 2021)
+    - "exclude": everything else, i.e. SEASON 2003, SEASON 2022
+      (incomplete) and the non-bubble games of SEASON 2019
+    The input DataFrame is not modified.
+    """
+    df = df.copy()
+    df["PERIOD"] = "exclude"
+    df.loc[df["SEASON"].isin(NORMAL_SEASONS), "PERIOD"] = "normal"
+    df.loc[df["SEASON"] == COVID_SEASON, "PERIOD"] = "covid_2021"
+    df.loc[df["BUBBLE"], "PERIOD"] = "bubble"
+    return df
 
 
 def clean_teams(df):
@@ -193,6 +219,9 @@ def main(data_dir=DATA_DIR):
     print(f"Rows before cleaning: {len(raw_games)}")
     print(f"Rows after cleaning: {len(games)}")
     print(f"Bubble games: {games['BUBBLE'].sum()}")
+    print("Games by PERIOD and GAME_TYPE (2 = regular season, "
+          "4 = playoffs):")
+    print(pd.crosstab(games["PERIOD"], games["GAME_TYPE"], margins=True))
     print(f"games_details rows: {len(raw_details)} -> {len(details)}")
     print(f"ranking rows: {len(raw_ranking)} -> {len(ranking)}")
     print(f"teams rows: {len(raw_teams)} -> {len(teams)}")
