@@ -1,0 +1,51 @@
+1. RQ1 B - logistic regression (one row per game)
+Model: logit P(home win) ~ SEASON, normal regular-season games (n = 19439).
+Why: OLS on 16 season averages throws away the game-level data and gives the short 2011 season (990 games) the same weight as the others. Logistic regression uses every game and models a 0/1 outcome directly.
+All normal seasons: slope = -0.00999 log-odds per season, p = 0.000865, odds ratio per decade = 0.905; predicted home win rate 0.609 (first season) -> 0.568 (last season)
+Without SEASON 2021: slope = -0.00647 log-odds per season, p = 0.06227, odds ratio per decade = 0.937; predicted home win rate 0.605 (first season) -> 0.583 (last season)
+Linearity check (likelihood-ratio test, straight line vs one effect per season): LR = 10.012, df = 14, p = 0.7613. No evidence against a straight line.
+Assumption: games are independent (same caveat as validity_checks.txt).
+
+========================================================================
+
+2. Playoff dependence - series-level permutation tests
+Problem: playoff games come in series of 4-7 games between the same two teams, so games in a series are not independent. The game-level tests treat 83 bubble playoff games as 83 independent observations, but they come from only 15 series.
+Fix: shuffle whole series between periods instead of single games. Exchangeability then only needs different series to be independent. 10000 shuffles, seed 163; the statistic is the per-game mean (win rate or POINT_DIFF) in the period minus the normal period.
+    period        outcome  observed_diff  games  series  p_game_level  p_series_level
+covid_2021 HOME_TEAM_WINS       -0.07437     85      15        0.2118           0.163
+covid_2021     POINT_DIFF         -1.165     85      15        0.4506          0.4272
+    bubble HOME_TEAM_WINS        -0.1571     83      15        0.0044          0.0046
+    bubble     POINT_DIFF         -3.506     83      15         0.022          0.0194
+If p_series_level is much larger than p_game_level, the game-level result was overstated by treating games in a series as independent.
+
+Why the two p-values are close: the variance of series-level home win rates is 0.90 times what independent games would give (1 = independent). Home court alternates between the two teams in a series, so the stronger team's edge shows up as home wins in some games and home losses in others, and HOME_TEAM_WINS is close to uncorrelated within a series.
+
+========================================================================
+
+3. Multiple comparisons
+RQ2 makes 4 comparisons per outcome (covid_2021 and bubble vs normal, regular season and playoffs). Holm's method controls the chance of any false positive in the family at 5%, like Bonferroni, but is less conservative.
+            family  GAME_TYPE     period    p_raw    p_holm  p_bonferroni  significant_holm
+ win rate (z-test)          2 covid_2021 0.002257  0.009027      0.009027              True
+ win rate (z-test)          2     bubble   0.5213    0.5213             1             False
+ win rate (z-test)          4 covid_2021   0.1673    0.3347        0.6693             False
+ win rate (z-test)          4     bubble 0.004008   0.01203       0.01603              True
+POINT_DIFF (Welch)          2 covid_2021 6.13e-05 0.0002452     0.0002452              True
+POINT_DIFF (Welch)          2     bubble   0.3807    0.7613             1             False
+POINT_DIFF (Welch)          4 covid_2021   0.4786    0.7613             1             False
+POINT_DIFF (Welch)          4     bubble  0.03186   0.09557        0.1274             False
+
+========================================================================
+
+4. Power analysis (alpha = 0.05, two-sided, normal period as the comparison group)
+power: chance the test would detect a true difference as large as the observed one. min_detectable: smallest true difference (win-rate points or POINT_DIFF points) detected with 80% power. games_needed: period games needed to detect the observed difference with 80% power.
+Power computed from the observed difference is only a rough guide; min_detectable is the more useful number because it does not depend on this sample's result.
+ GAME_TYPE     period    outcome  n_period  observed_diff   power  min_detectable  games_needed
+         2 covid_2021   win rate      1080         -0.047  0.8588         0.04336           913
+         2 covid_2021 POINT_DIFF      1080         -1.898  0.9888           1.253           457
+         2     bubble   win rate        88        -0.0337 0.09776           0.149          1851
+         2     bubble POINT_DIFF        88         -1.194  0.1375           3.902           983
+         4 covid_2021   win rate        85       -0.07437  0.2746          0.1548           455
+         4 covid_2021 POINT_DIFF        85         -1.165  0.1131           4.466          9439
+         4     bubble   win rate        83        -0.1571  0.8028          0.1566            83
+         4     bubble POINT_DIFF        83         -3.506   0.599           4.443           139
+A non-significant result with low power means 'no evidence of a difference', not 'no difference'.

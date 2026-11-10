@@ -52,7 +52,7 @@ Run `source .venv/bin/activate` again every time you open a new terminal.
 
 Run every command from the project folder with the virtual environment
 activated, **in this order**. Each analysis script cleans `data/games.csv`
-itself (by calling `clean.py`), so steps 3 and 4 do not depend on the
+itself (by calling `clean.py`), so steps 3–5 do not depend on the
 `*_clean.csv` files, but steps 1 and 2 are the quickest way to confirm the
 setup works.
 
@@ -62,6 +62,7 @@ setup works.
 | 2 | `python clean.py` | Cleans `games.csv`, `games_details.csv`, `ranking.csv` and `teams.csv`, adds `GAME_TYPE`, `POINT_DIFF`, `BUBBLE` and `PERIOD`, and prints row counts and games per `PERIOD` x `GAME_TYPE`. | `data/*_clean.csv` |
 | 3 | `python eda_games.py` | Exploratory data analysis of the games: data size, missing values, summaries of the research variables, and home win rates by season and by period. | `results/eda_games.txt`, `figures/fig1`–`fig3` |
 | 4 | `python validity_checks.py` | Result Validity checks for RQ1 and RQ2: runs each planned test (binomial test, OLS trend, two-proportion z-test, Welch's t-test, permutation test) and checks its assumptions. | `results/validity_checks.txt`, `figures/fig4`–`fig5` |
+| 5 | `python robustness_checks.py` | Follow-up checks for problems found in step 4: game-level logistic regression for the RQ1 trend, series-level permutation tests for playoff games, Holm / Bonferroni adjustment for multiple comparisons, and power analysis for the small bubble groups. | `results/robustness_checks.txt`, `figures/fig6` |
 
 ### Tests and style
 
@@ -73,6 +74,7 @@ worked out by hand. Each prints a "passed" message at the end.
 | `python test_clean.py` | `clean.py` |
 | `python test_eda.py` | calculation functions in `eda_games.py` |
 | `python test_validity_checks.py` | calculation functions in `validity_checks.py` |
+| `python test_robustness_checks.py` | calculation functions in `robustness_checks.py` |
 | `flake8 *.py` | code style of every script (no output means no problems) |
 
 ## Cleaned data
@@ -105,7 +107,8 @@ Other useful columns:
 | `clean.py` | Data cleaning functions and the cleaning pipeline |
 | `eda_games.py` | Exploratory data analysis of `games.csv` |
 | `validity_checks.py` | Hypothesis tests and assumption checks for RQ1 and RQ2 |
-| `test_clean.py`, `test_eda.py`, `test_validity_checks.py` | Tests for the scripts above |
-| `figures/` | Figures produced by `eda_games.py` and `validity_checks.py` |
-| `results/` | Text results produced by `eda_games.py` and `validity_checks.py` |
+| `robustness_checks.py` | Logistic regression, series-level permutation tests, multiple-comparison adjustment and power analysis |
+| `test_clean.py`, `test_eda.py`, `test_validity_checks.py`, `test_robustness_checks.py` | Tests for the scripts above |
+| `figures/` | Figures produced by steps 3–5 |
+| `results/` | Text results produced by steps 3–5 |
 | `requirements.txt` | Python packages used by the project |
