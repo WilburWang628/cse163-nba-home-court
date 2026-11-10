@@ -1,0 +1,9 @@
+# Data files are large and come from Kaggle (see README)
+data/
+
+# Python
+.venv/
+__pycache__/
+
+# macOS
+.DS_Store
