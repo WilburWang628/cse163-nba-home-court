@@ -1,0 +1,128 @@
+Dataset Dimensions
+Rows:  515510
+Columns:  34
+Each row represents an NBA game.
+
+Missing Values
+GAME_ID                   0
+TEAM_ID                   0
+TEAM_ABBREVIATION         0
+TEAM_CITY                 0
+PLAYER_ID                 0
+PLAYER_NAME               0
+NICKNAME             475880
+START_POSITION       267166
+COMMENT              515510
+MIN                       0
+FGM                       0
+FGA                       0
+FG_PCT                    0
+FG3M                      0
+FG3A                      0
+FG3_PCT                   0
+FTM                       0
+FTA                       0
+FT_PCT                    0
+OREB                      0
+DREB                      0
+REB                       0
+AST                       0
+STL                       0
+BLK                       0
+TO                        0
+PF                        0
+PTS                       0
+PLUS_MINUS                0
+SEASON                    0
+GAME_TYPE                 0
+BUBBLE                    0
+PERIOD                    0
+HOME                      0
+dtype: int64
+NICKNAME, START_POSITION, and COMMENT presents a significantamount of missing data, whileh all other columns have nomissing data.
+
+Missing Value Percentages
+GAME_ID                0.000000
+TEAM_ID                0.000000
+TEAM_ABBREVIATION      0.000000
+TEAM_CITY              0.000000
+PLAYER_ID              0.000000
+PLAYER_NAME            0.000000
+NICKNAME              92.312467
+START_POSITION        51.825571
+COMMENT              100.000000
+MIN                    0.000000
+FGM                    0.000000
+FGA                    0.000000
+FG_PCT                 0.000000
+FG3M                   0.000000
+FG3A                   0.000000
+FG3_PCT                0.000000
+FTM                    0.000000
+FTA                    0.000000
+FT_PCT                 0.000000
+OREB                   0.000000
+DREB                   0.000000
+REB                    0.000000
+AST                    0.000000
+STL                    0.000000
+BLK                    0.000000
+TO                     0.000000
+PF                     0.000000
+PTS                    0.000000
+PLUS_MINUS             0.000000
+SEASON                 0.000000
+GAME_TYPE              0.000000
+BUBBLE                 0.000000
+PERIOD                 0.000000
+HOME                   0.000000
+dtype: float64
+NICKNAME misses more than 90 percent of content, START_POSITIONmisses more than half content, and COMMENT misses all content,while other columns have no missing data.
+
+Statistical Summary
+                 FTA             PF            FGA            MIN
+count  515510.000000  515510.000000  515510.000000  515510.000000
+mean        2.292367       2.005637       8.025030      23.293145
+std         2.910685       1.502862       5.766394      11.341555
+min         0.000000       0.000000       0.000000       0.000000
+25%         0.000000       1.000000       4.000000      14.883333
+50%         2.000000       2.000000       7.000000      23.916667
+75%         4.000000       3.000000      12.000000      32.366667
+max        39.000000       6.000000      50.000000      64.966667
+
+Team Statistics
+    GAME_ID   HOME  PERIOD   FTA    PF   FGA
+0  20400001  False  normal  22.0  24.0  71.0
+1  20400001   True  normal  25.0  22.0  72.0
+2  20400002  False  normal  30.0  19.0  87.0
+3  20400002   True  normal  23.0  23.0  81.0
+4  20400003  False  normal  21.0  21.0  88.0
+
+Game Differences
+    GAME_ID  PERIOD  HOME_FTA  ...  FTA_DIFF  FGA_DIFF  PF_DIFF
+0  20400001  normal      25.0  ...       3.0       1.0     -2.0
+1  20400002  normal      23.0  ...      -7.0      -6.0      4.0
+2  20400003  normal      30.0  ...       9.0     -18.0      1.0
+3  20400004  normal      26.0  ...       2.0       6.0     -6.0
+4  20400005  normal      18.0  ...      -2.0      -5.0     -2.0
+
+[5 rows x 11 columns]
+
+Average Differences by Period
+            FTA_DIFF                   ... PF_DIFF                 
+                mean median       std  ...  median       std  count
+PERIOD                                 ...                         
+bubble      0.543860    1.0  9.743903  ...     0.0  5.053093    171
+covid_2021  0.787124    1.0  8.695854  ...     0.0  4.896147   1165
+normal      1.091001    1.0  9.477106  ...    -1.0  5.158626  20780
+
+[3 rows x 8 columns]
+
+Normality Check
+normal FTA Histogram Sample Size:  20780
+covid_2021 FTA Histogram Sample Size:  1165
+bubble FTA Histogram Sample Size:  171
+
+Paired T-test
+T-statistic: 16.86912259155969
+P-value: 1.8936038724032594e-63
