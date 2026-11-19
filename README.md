@@ -64,6 +64,7 @@ setup works.
 | 4 | `python validity_checks.py` | Result Validity checks for RQ1 and RQ2: runs each planned test (binomial test, OLS trend, two-proportion z-test, Welch's t-test, permutation test) and checks its assumptions. | `results/validity_checks.txt`, `figures/fig4`–`fig5` |
 | 5 | `python robustness_checks.py` | Follow-up checks for problems found in step 4: game-level logistic regression for the RQ1 trend, series-level permutation tests for playoff games, Holm / Bonferroni adjustment for multiple comparisons, and power analysis for the small bubble groups. | `results/robustness_checks.txt`, `figures/fig6` |
 | 6 | `python eda_ranking.py` | RQ4: final standings for each team and season from `data/ranking_clean.csv` (needs step 2), home-court advantage (HCA = home win rate - road win rate) by team and season, and the one-way ANOVA (all teams equal?) and Welch's t-test (Denver and Utah vs. the rest) with their assumption checks. | `results/eda_ranking.txt`, `figures/fig10`–`fig13` |
+| 7 | `python eda_details.py` | RQ3: player box scores from `data/games_details_clean.csv` (needs step 2): data size, missing values, summaries of `FTA`, `PF`, `FGA` and `MIN`, home-minus-away free-throw and foul differences by period, and a one-sample t-test of the free-throw difference. | `results/eda_details.txt`, `figures/fig7`–`fig9` |
 
 ### Tests and style
 
@@ -77,6 +78,7 @@ worked out by hand. Each prints a "passed" message at the end.
 | `python test_validity_checks.py` | calculation functions in `validity_checks.py` |
 | `python test_robustness_checks.py` | calculation functions in `robustness_checks.py` |
 | `python test_eda_ranking.py` | calculation functions in `eda_ranking.py` |
+| `python eda_details_test.py` | calculation functions in `eda_details.py` |
 | `flake8 *.py` | code style of every script (no output means no problems) |
 
 ## Cleaned data
@@ -111,8 +113,10 @@ Other useful columns:
 | `validity_checks.py` | Hypothesis tests and assumption checks for RQ1 and RQ2 |
 | `robustness_checks.py` | Logistic regression, series-level permutation tests, multiple-comparison adjustment and power analysis |
 | `eda_ranking.py` | RQ4: home-court advantage by team (Denver and Utah vs. the rest), EDA and assumption checks |
+| `eda_details.py` | RQ3: exploratory data analysis of player box scores (free throws and fouls, home vs. away) |
 | `test_eda_ranking.py` | Tests for `eda_ranking.py` |
+| `eda_details_test.py` | Tests for `eda_details.py` |
 | `test_clean.py`, `test_eda.py`, `test_validity_checks.py`, `test_robustness_checks.py` | Tests for the scripts above |
-| `figures/` | Figures produced by steps 3–5 |
-| `results/` | Text results produced by steps 3–5 |
+| `figures/` | Figures produced by steps 3–7 |
+| `results/` | Text results produced by steps 3–7 |
 | `requirements.txt` | Python packages used by the project |
