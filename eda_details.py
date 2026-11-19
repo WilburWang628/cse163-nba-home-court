@@ -1,10 +1,12 @@
 '''
 CSE 163 Final Project: NBA home-court advantage.
-This file takes in a data frame of NBA game details, explores the statistics
-of player performance based on free throw percentage(FTA), number of points
-scored per player(PF), field goal percentage(FGA), and field goals made(MIN).
-And generates two figures about free throw difference in home-court and
-non-home-court, and free throw distribution by periods.
+This file takes in a data frame of NBA player box scores (one row per
+player per game) and explores free-throw attempts (FTA), personal fouls
+(PF), field-goal attempts (FGA) and minutes played (MIN). It sums the
+players into team totals, compares the home and away teams in each game,
+and generates three figures about the home-minus-away free-throw
+difference: by period, its distribution by period, and its overall
+distribution.
 '''
 
 
@@ -27,19 +29,19 @@ def explore_data(data: pd.DataFrame, file) -> None:
     print('Dataset Dimensions', file=file)
     print('Rows: ', data.shape[0], file=file)
     print('Columns: ', data.shape[1], file=file)
-    print('Each row represents an NBA game.', file=file)
+    print('Each row represents one player in one NBA game.', file=file)
 
     print('\nMissing Values', file=file)
     print(data.isna().sum(), file=file)
-    print('NICKNAME, START_POSITION, and COMMENT presents a significant '
-          'amount of missing data, whileh all other columns have no '
+    print('NICKNAME, START_POSITION, and COMMENT have a significant '
+          'amount of missing data, while all other columns have no '
           'missing data.', file=file)
 
     print('\nMissing Value Percentages', file=file)
     print(data.isna().mean() * 100, file=file)
-    print('NICKNAME misses more than 90 percent of content, START_POSITION '
-          'misses more than half content, and COMMENT misses all content, '
-          'while other columns have no missing data.', file=file)
+    print('NICKNAME is missing in more than 90 percent of rows, '
+          'START_POSITION in more than half, and COMMENT in all rows, '
+          'while the other columns have no missing data.', file=file)
 
     columns = ['FTA', 'PF', 'FGA', 'MIN']
     print('\nStatistical Summary', file=file)
@@ -49,9 +51,9 @@ def explore_data(data: pd.DataFrame, file) -> None:
 def aggregate_team_stats(data: pd.DataFrame) -> pd.DataFrame:
     '''
     This function takes a data frame and
-    aggregates players' field goal percentage (FGA),
-    free throw percentage (FTA), and number of points scored (PF)
-    to get their respective teams' data.
+    sums players' field-goal attempts (FGA), free-throw attempts
+    (FTA) and personal fouls (PF) to get their teams' totals in each
+    game.
     It then returns a data frame of the team's data.
     '''
 
@@ -133,7 +135,7 @@ def plot_fta_distribution(games: pd.DataFrame) -> None:
 
 def plot_fta_histogram(games: pd.DataFrame) -> None:
     '''
-    This funcion takes in a data frame of the game details containing
+    This function takes in a data frame of the game details containing
     home-away differences, and plots the distribution of FTA.
     '''
 
