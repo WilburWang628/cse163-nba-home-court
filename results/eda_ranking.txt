@@ -1,0 +1,200 @@
+1. DATA SIZE
+Raw ranking.csv: 210342 rows x 13 columns
+ranking_clean.csv: 197350 rows x 18 columns
+Raw teams.csv: 30 rows x 14 columns
+Each row of ranking.csv is one team's standings on one day (wins, losses, home record and road record so far that season). The file covers 7023 different dates, which is why it has so many rows: about 30 teams x hundreds of days per season.
+ranking_clean.csv keeps only regular-season standings from SEASON 2003 on, drops repeated team/season/date rows and adds SEASON, HOME_W, HOME_L, ROAD_W and ROAD_L.
+Each row of teams.csv is one current NBA franchise (30 teams).
+
+2. MISSING VALUES
+ranking.csv (210342 rows), columns with missing values:
+              missing  percent
+RETURNTOPLAY   206352    98.10
+The other 12 columns have no missing values.
+RETURNTOPLAY only exists for the 2019-20 season restart (was the team invited to the bubble). RQ4 does not use it, and HOME_RECORD / ROAD_RECORD, the columns we need, are complete.
+
+teams.csv (30 rows), columns with missing values:
+               missing  percent
+ARENACAPACITY        4    13.33
+ARENACAPACITY is not used in RQ4. TEAM_ID, CITY and NICKNAME (used to build TEAM_NAME) are complete, so missing values do not affect this analysis.
+
+3. FINAL STANDINGS AND CHECKS
+Seasons kept: 2004-2018 and 2021 (the 'normal' PERIOD in games_clean.csv). 16 seasons, 480 team-seasons.
+Each row is now one team in one season, taken from the last STANDINGSDATE of that season (its final record).
+Games played (HOME_W + HOME_L + ROAD_W + ROAD_L) by season:
+        min  max
+SEASON          
+2004     82   82
+2005     82   82
+2006     82   82
+2007     82   82
+2008     82   82
+2009     82   82
+2010     82   82
+2011     66   66
+2012     81   82
+2013     82   82
+2014     82   82
+2015     82   82
+2016     82   82
+2017     82   82
+2018     82   82
+2021     82   82
+Team-seasons that do not have 82 games (66 in 2011):
+ SEASON      TEAM_NAME  GAMES_PLAYED  HOME_W  HOME_L  ROAD_W  ROAD_L
+   2012 Boston Celtics            81      27      13      14      27
+   2012 Indiana Pacers            81      30      11      19      21
+The 2012 rows with 81 games are Boston and Indiana: their April 16, 2013 game was cancelled after the Boston Marathon bombing and never made up, so 81 is correct.
+HOME_W + ROAD_W equals W in every row: True.
+TEAM_IDs with no match in teams_clean.csv: none.
+Note: TEAM_NAME is the franchise's current name, so e.g. the Seattle SuperSonics seasons (2004-2007) are listed under Oklahoma City Thunder and New Jersey under Brooklyn Nets.
+
+4. RESEARCH VARIABLES (480 team-seasons)
+Numeric variables (HOME_PCT = home win rate, ROAD_PCT = road win rate, HCA = HOME_PCT - ROAD_PCT):
+             mean   std      min       Q1   median       Q3      max
+HOME_PCT    0.590 0.168    0.121    0.479    0.610    0.712    0.976
+ROAD_PCT    0.410 0.155    0.073    0.293    0.415    0.512    0.829
+HCA         0.181 0.110   -0.121    0.098    0.171    0.244    0.488
+SEASON   2011.625 4.838 2004.000 2007.750 2011.500 2015.250 2021.000
+
+SEASON (categorical): team-seasons per season:
+2004: 30, 2005: 30, 2006: 30, 2007: 30, 2008: 30, 2009: 30, 2010: 30, 2011: 30, 2012: 30, 2013: 30, 2014: 30, 2015: 30, 2016: 30, 2017: 30, 2018: 30, 2021: 30
+
+TEAM_NAME (categorical): seasons per team:
+  Atlanta Hawks: 16
+  Boston Celtics: 16
+  Brooklyn Nets: 16
+  Charlotte Hornets: 16
+  Chicago Bulls: 16
+  Cleveland Cavaliers: 16
+  Dallas Mavericks: 16
+  Denver Nuggets: 16
+  Detroit Pistons: 16
+  Golden State Warriors: 16
+  Houston Rockets: 16
+  Indiana Pacers: 16
+  Los Angeles Clippers: 16
+  Los Angeles Lakers: 16
+  Memphis Grizzlies: 16
+  Miami Heat: 16
+  Milwaukee Bucks: 16
+  Minnesota Timberwolves: 16
+  New Orleans Pelicans: 16
+  New York Knicks: 16
+  Oklahoma City Thunder: 16
+  Orlando Magic: 16
+  Philadelphia 76ers: 16
+  Phoenix Suns: 16
+  Portland Trail Blazers: 16
+  Sacramento Kings: 16
+  San Antonio Spurs: 16
+  Toronto Raptors: 16
+  Utah Jazz: 16
+  Washington Wizards: 16
+
+5. HCA TABLES
+Figure 10: mean HCA by team (largest first)
+                        seasons  mean_hca  sd_hca  home_pct  road_pct
+TEAM_NAME                                                            
+Utah Jazz                    16     0.246   0.131     0.657     0.411
+Portland Trail Blazers       16     0.241   0.091     0.623     0.383
+Indiana Pacers               16     0.239   0.087     0.626     0.387
+Denver Nuggets               16     0.234   0.157     0.678     0.444
+San Antonio Spurs            16     0.211   0.152     0.788     0.577
+Washington Wizards           16     0.208   0.123     0.548     0.340
+Atlanta Hawks                16     0.205   0.092     0.582     0.377
+Cleveland Cavaliers          16     0.203   0.088     0.628     0.424
+Charlotte Hornets            16     0.202   0.100     0.505     0.303
+Memphis Grizzlies            16     0.196   0.075     0.598     0.402
+Los Angeles Clippers         16     0.192   0.107     0.616     0.424
+Milwaukee Bucks              16     0.190   0.093     0.554     0.363
+Detroit Pistons              16     0.189   0.098     0.575     0.387
+Golden State Warriors        16     0.188   0.124     0.666     0.478
+Los Angeles Lakers           16     0.179   0.089     0.584     0.405
+Orlando Magic                16     0.176   0.122     0.546     0.370
+Dallas Mavericks             16     0.171   0.127     0.670     0.499
+Sacramento Kings             16     0.167   0.114     0.468     0.301
+New Orleans Pelicans         16     0.167   0.094     0.538     0.371
+Miami Heat                   16     0.165   0.105     0.660     0.494
+Toronto Raptors              16     0.164   0.086     0.596     0.432
+Chicago Bulls                16     0.161   0.113     0.612     0.451
+Oklahoma City Thunder        16     0.160   0.083     0.622     0.462
+Minnesota Timberwolves       16     0.160   0.124     0.458     0.297
+Boston Celtics               16     0.149   0.109     0.644     0.495
+Houston Rockets              16     0.149   0.118     0.654     0.506
+Philadelphia 76ers           16     0.137   0.108     0.504     0.367
+New York Knicks              16     0.136   0.091     0.459     0.324
+Phoenix Suns                 16     0.127   0.081     0.579     0.452
+Brooklyn Nets                16     0.117   0.124     0.477     0.360
+
+Figure 12: league mean HCA by season
+        teams  mean_hca  home_pct  road_pct
+SEASON                                     
+2004       30     0.210     0.605     0.395
+2005       30     0.207     0.603     0.397
+2006       30     0.182     0.591     0.409
+2007       30     0.202     0.601     0.399
+2008       30     0.216     0.608     0.392
+2009       30     0.189     0.594     0.406
+2010       30     0.208     0.604     0.396
+2011       30     0.172     0.586     0.414
+2012       30     0.224     0.612     0.388
+2013       30     0.161     0.580     0.420
+2014       30     0.150     0.575     0.425
+2015       30     0.177     0.589     0.411
+2016       30     0.167     0.584     0.416
+2017       30     0.158     0.579     0.421
+2018       30     0.185     0.593     0.407
+2021       30     0.088     0.544     0.456
+
+6. RESULT VALIDITY - NULL HYPOTHESIS A
+H0: all 30 teams have the same mean HCA. H1: at least one team's mean HCA is different.
+Planned test: one-way ANOVA (scipy.stats.f_oneway), 30 groups of 16 seasons each.
+  F = 1.539, p = 0.0381 -> reject H0 at alpha = 0.05
+  Effect size eta^2 = 0.090 (share of HCA variation explained by which team it is)
+  Context: with about 41 home and 41 road games a season, chance alone gives one season's HCA an SD of about 0.103. The observed SD of HCA around each team's own mean is 0.105, so most of the season-to-season spread is game-to-game luck, and team differences are small next to it.
+
+Assumption 1 - equal variances across teams (Levene's test, median-centered):
+  W = 1.256, p = 0.1718. Team SDs of HCA range from 0.075 to 0.157.
+  -> MET
+Assumption 2 - roughly normal values in each group:
+  Shapiro-Wilk per team: 0 of 30 teams have p < 0.05 (about 1.5 would be expected by chance even if all were normal). With only 16 values per team these tests have little power, so we also test the pooled residuals.
+  Shapiro-Wilk on all 480 residuals (HCA minus team mean): W = 0.9956, p = 0.1895. Q-Q plot: figures/fig13_hca_residual_qq.png
+  -> MET
+Assumption 3 - independent observations:
+  Different teams are different groups, but the same team's seasons may be linked (same coach, players, arena).
+  Lag-1 correlation of a team's residual with its next season's residual: r = -0.068. Subtracting the team mean by itself pushes this correlation to about -1/(16 - 1) = -0.067 even for fully independent seasons, so the observed value is what independence predicts.
+  -> MET
+  Caveat: all teams share league-wide changes in a season (e.g. 2021 has the lowest league HCA). That affects every team the same way, so it adds noise but does not favor any team.
+
+Backup if the assumptions fail: Kruskal-Wallis test (scipy.stats.kruskal), which compares ranks and does not need normality.
+  H = 36.671, p = 0.1548 -> fail to reject H0
+
+7. RESULT VALIDITY - NULL HYPOTHESIS B
+H0: the mean HCA of Denver and Utah equals the mean HCA of the other 28 teams. H1: the means differ.
+Altitude group: n = 32 team-seasons, mean HCA = 0.240, SD = 0.142
+Other teams:    n = 448 team-seasons, mean HCA = 0.177, SD = 0.107
+Difference in means: +0.063
+Ranks of the team means (1 = largest HCA of 30): Denver Nuggets: 4, Utah Jazz: 1
+
+Planned test: Welch's t-test (scipy.stats.ttest_ind, equal_var=False).
+  t = 2.467, two-sided p = 0.018884 -> reject H0
+  One-sided p (altitude HCA greater) = 0.009442
+  For comparison, Student's t-test (equal variances): p = 0.001671
+Why Welch: the groups are very unequal in size (32 vs 448). Student's t-test assumes equal variances, and when the small group has a different variance its p-value can be badly wrong. Welch's test does not assume equal variances and loses almost nothing when they are equal.
+
+Assumption 1 - normality: the t-test compares means, and with n = 32 and 448 the sample means are close to normal (central limit theorem).
+  Shapiro-Wilk on the altitude group: p = 0.3477 -> MET
+Assumption 2 - equal variances: NOT needed for Welch. (Levene's test between the two groups: p = 0.0082.)
+Assumption 3 - independence: the 32 altitude team-seasons come from only 2 franchises, so they are not 32 independent draws if a team's HCA is partly a stable team trait. Team-level check that treats each team as one observation: an exact permutation test over all 435 pairs of teams. If altitude did not matter, Denver + Utah would be just a random pair.
+  Share of pairs with an average mean HCA >= Denver + Utah's: p = 0.0069 (one-sided) -> reject H0
+  (A t-test on the 30 team means is not used: with only 2 teams in one group, their variance estimate is unreliable.)
+
+Backup if the assumptions fail: Mann-Whitney U test (two-group version of Kruskal-Wallis).
+  p = 0.014520 -> reject H0
+
+8. FIGURES
+figures/fig10_mean_hca_by_team.png
+figures/fig11_hca_boxplot_by_team.png
+figures/fig12_league_hca_by_season.png
+figures/fig13_hca_residual_qq.png
